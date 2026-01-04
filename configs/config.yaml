@@ -1,0 +1,87 @@
+data:
+  raw_data_dir: raw_data/Data
+  images_dir: Images
+  labels_dir: Labels
+  annotation_dir: Annotation_Json_File
+  class_label_file: classes.txt
+  processed_dir: pipeline_output/processed_data
+preprocessing:
+  resize_dim:
+  - 640
+  - 640
+  augmentation:
+    dist:
+      HorizontalFlip: 0.25
+      VerticalFlip: 0.25
+      GaussianBlur: 0.25
+      SaltandPepper: 0.25
+    file_selection:
+      method: random
+      csv_path: M34_images_for_augmentation_Marico_MC1_Landsacpe.csv
+      prob: 0.5
+    cycle: 1
+    exp: false
+    train_only: true
+  split:
+    detection_ratio:
+    - 0.7
+    - 0.15
+    - 0.15000000000000005
+    classification_ratio:
+    - 0.7
+    - 0.15
+    - 0.15000000000000005
+  output:
+    detection:
+      augmented:
+        images: Detection/Augmented/images
+        labels: Detection/Augmented/labels
+      original_sized:
+        images: Detection/OriginalSized/images
+        labels: Detection/OriginalSized/labels
+      resized:
+        images: Detection/Resized/images
+        labels: Detection/Resized/labels
+      split_path: Detection/data
+    classification:
+      original: Classification/Original
+      main_csv: Classification/main.csv
+      train_csv: Classification/train.csv
+      test_csv: Classification/test.csv
+training:
+  object_detection:
+    enabled: true
+    model:
+      version: yolov8
+      size: s
+    data_path: pipeline_output/processed_data/Detection/data/data.yaml
+    epochs: 1
+    batch_size: 16
+    learning_rate: 0.001
+    img_size: 640
+    save_dir: pipeline_output/models/object_detection
+    save_every: null
+  classification:
+    enabled: true
+    model:
+      version: yolov8
+      size: s
+    data_path: pipeline_output/processed_data/Classification/Split/data.yaml
+    epochs: 1
+    batch_size: 32
+    learning_rate: 0.001
+    img_size: 224
+    save_dir: pipeline_output/models/classification
+    save_every: null
+evaluation:
+  object_detection:
+    enabled: true
+    model_weights: yolov8s.pt
+    unseen_data_path: /home/bacancy/projects/DP_Pipelines/DP_Data_Prep_Pipline_CV_V1/pipeline_output/processed_data/Detection/data/test/
+    save_dir: pipeline_output/evaluation/object_detection
+  classification:
+    enabled: true
+    model_weights: yolov8s-cls.pt
+    unseen_data_path: pipeline_output/processed_data/Classification/Split/test/0/
+    save_dir: pipeline_output/evaluation/classification
+deployment: null

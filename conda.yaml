@@ -1,0 +1,36 @@
+name: DP_Pipelines_CV_V1
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - scikit-learn
+  - scipy
+  - pillow
+  - pyyaml
+  - requests
+  - tqdm
+  - jupyter
+  - ipython
+  - pip:
+    - ultralytics==8.3.185
+    - mlflow==3.3.1
+    - opencv-python==4.5.5.64
+    - albumentations==1.3.0
+    - streamlit>=1.28.0
+    - loguru
+    - accessify==0.3.1
+    - boto3==1.26.65
+    - flask==2.2.2
+    - gunicorn==20.1.0
+    - humanfriendly
+    - cloudpathlib
+    - pydantic==1.10.4
+    - plotly==5.13.0
+    - -r requirements.txt

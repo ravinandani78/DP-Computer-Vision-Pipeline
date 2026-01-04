@@ -1,0 +1,16 @@
+name: DP_Pipelines
+
+conda_env: conda.yaml
+
+entry_points:
+  preprocess:
+    command: "python src/run_preprocessing.py --config configs/config.yaml"
+  
+  train:
+    command: "python src/DpTraining/main.py --config configs/config.yaml"
+
+  evaluate:
+    command: "python src/DpEvaluation/main.py --config configs/config.yaml"
+
+  deploy:
+    command: "python src/DpDeployment/main.py --config configs/config.yaml"

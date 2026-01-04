@@ -1,0 +1,8 @@
+venv/
+pipeline_output/models/*
+pipeline_output/processed_data/*
+pipeline_output/evaluation/*
+mlruns/
+raw_data/Data/Labels/*
+raw_data/Data/classes.txt
+raw_data/Data/Images/*
