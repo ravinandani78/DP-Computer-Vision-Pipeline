@@ -77,7 +77,7 @@ evaluation:
   object_detection:
     enabled: true
     model_weights: yolov8s.pt
-    unseen_data_path: /home/bacancy/projects/DP_Pipelines/DP_Data_Prep_Pipline_CV_V1/pipeline_output/processed_data/Detection/data/test/
+    unseen_data_path: pipeline_output/processed_data/Detection/data/test/
     save_dir: pipeline_output/evaluation/object_detection
   classification:
     enabled: true
