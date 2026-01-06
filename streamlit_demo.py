@@ -100,6 +100,11 @@ def run_pipeline_command(command: str, module_name: str):
             # Create a placeholder for real-time output
             output_placeholder = st.empty()
             
+            # Use sys.executable to ensure same Python interpreter
+            # Replace 'python3' with sys.executable in the command
+            if command.startswith('python3'):
+                command = command.replace('python3', sys.executable, 1)
+            
             # Run the command
             process = subprocess.Popen(
                 command,
@@ -108,7 +113,7 @@ def run_pipeline_command(command: str, module_name: str):
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
                 cwd=os.getcwd(),
-                env=os.environ.copy()
+                env=os.environ.copy()  # Ensure environment variables are passed
             )
             
             output_lines = []
