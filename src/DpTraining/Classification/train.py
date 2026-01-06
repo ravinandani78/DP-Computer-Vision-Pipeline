@@ -7,7 +7,20 @@ def train_classification(config):
     """
     Trains a YOLOv8 classification model.
     """
-    with mlflow.start_run(run_name="classification_training") as run:
+    # Ensure MLflow tracking URI is set to the default location
+    # Go up from Classification/train.py -> DpTraining -> src -> project root
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..'))
+    mlruns_dir = os.path.join(project_root, 'mlruns')
+    mlflow.set_tracking_uri(f"file://{mlruns_dir}")
+    
+    run_id = None
+    run = None
+    training_successful = False
+    try:
+        run = mlflow.start_run(run_name="classification_training")
+        # Store run_id early to avoid accessing it after context exits
+        run_id = run.info.run_id
+        
         mlflow.log_param("model_type", "classification")
         mlflow.log_params(config)
 
@@ -56,4 +69,22 @@ def train_classification(config):
         save_dir = model.trainer.save_dir
         mlflow.log_artifacts(str(save_dir), artifact_path="yolo_classification_model")
 
-        print(f"Classification training complete. Model and metrics logged to MLflow run: {run.info.run_id}")
+        training_successful = True
+        print(f"Classification training complete. Model and metrics logged to MLflow run: {run_id}")
+        
+    except Exception as e:
+        if run_id:
+            print(f"Classification training encountered an error. MLflow run ID: {run_id}")
+        else:
+            print(f"Classification training encountered an error before MLflow run was created.")
+        raise
+    finally:
+        # Manually end the run to avoid context manager issues
+        if run is not None:
+            try:
+                status = "FINISHED" if training_successful else "FAILED"
+                mlflow.end_run(status=status)
+            except Exception as e:
+                # Suppress errors during run finalization - run data is already saved
+                # This is a known issue with MLflow file store when runs are finalized
+                print(f"Warning: Could not finalize MLflow run (this is usually safe to ignore): {str(e)}")

@@ -26,8 +26,12 @@ def evaluate_detection(config):
     """
     logger = setup_logging()
     
+    run_id = None
     try:
         with mlflow.start_run(run_name="object_detection_evaluation") as run:
+            # Store run_id early to avoid accessing it after context exits
+            run_id = run.info.run_id
+            
             mlflow.log_param("model_type", "object_detection_evaluation")
             
             eval_config = config['evaluation']['object_detection']
@@ -111,10 +115,13 @@ def evaluate_detection(config):
             if os.path.exists(temp_yaml_path):
                 os.remove(temp_yaml_path)
 
-            logger.info(f"Evaluation complete. Results saved in {output_dir} and logged to MLflow run: {run.info.run_id}")
+            logger.info(f"Evaluation complete. Results saved in {output_dir} and logged to MLflow run: {run_id}")
             
     except Exception as e:
-        logger.error(f"Error during object detection evaluation: {str(e)}")
+        if run_id:
+            logger.error(f"Error during object detection evaluation. MLflow run ID: {run_id}. Error: {str(e)}")
+        else:
+            logger.error(f"Error during object detection evaluation: {str(e)}")
         raise
 
 def _create_temp_data_yaml(unseen_data_path, temp_yaml_path, train_config):

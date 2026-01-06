@@ -1,7 +1,7 @@
 import os
 import shutil
 from loguru import logger
-# from DpPreprocessing.Preparation.fetchData import download_from_s3
+from DpPreprocessing.Preparation.fetchData import download_from_s3
 from DpPreprocessing.FormatConversion.custom_conversion import convert2yolo
 from DpPreprocessing.Augmentation import DetectionAugmentation, FileSelection
 from DpPreprocessing.Preparation.Detection2Classification import crop_and_save_images
@@ -81,8 +81,8 @@ class PrepareDataset(object):
     @private
     def download_data(self, client, *args, **kwargs):
         logger.info(f"Downloading Dataset using {client} client")
-        # if client == 's3':
-        #     download_from_s3(*args, **kwargs)
+        if client == 's3':
+            download_from_s3(*args, **kwargs)
 
     @private
     def create_labels(self):

@@ -19,7 +19,7 @@ dependencies:
   - jupyter
   - ipython
   - pip:
-    - ultralytics==8.3.185
+    - ultralytics==8.0.196
     - mlflow==3.3.1
     - opencv-python>=4.6.0
     - albumentations==1.3.0

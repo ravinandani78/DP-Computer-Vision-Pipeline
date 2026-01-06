@@ -3,18 +3,32 @@ import yaml
 import argparse
 import os
 import sys
+import json
+import time
+
+# #region agent log
+with open('/home/bacancy/projects/DP_Pipelines/DP-Computer-Vision-Pipeline/.cursor/debug.log', 'a') as f:
+    f.write(json.dumps({"sessionId":"debug-session","runId":"pre-import","hypothesisId":"A","location":"train.py:8","message":"Before setting env var","data":{"yolo_mlflow_disabled":os.environ.get("YOLO_MLFLOW_LOGGING_DISABLED")},"timestamp":int(time.time()*1000)}) + '\n')
+# #endregion
+
+# Disable ultralytics's own MLflow logging at the VERY START, before any imports
+os.environ["YOLO_MLFLOW_LOGGING_DISABLED"] = "True"
+
+# #region agent log
+with open('/home/bacancy/projects/DP_Pipelines/DP-Computer-Vision-Pipeline/.cursor/debug.log', 'a') as f:
+    f.write(json.dumps({"sessionId":"debug-session","runId":"pre-import","hypothesisId":"A","location":"train.py:12","message":"After setting env var","data":{"yolo_mlflow_disabled":os.environ.get("YOLO_MLFLOW_LOGGING_DISABLED")},"timestamp":int(time.time()*1000)}) + '\n')
+# #endregion
 
 # Add src to path to allow imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+# #region agent log
+with open('/home/bacancy/projects/DP_Pipelines/DP-Computer-Vision-Pipeline/.cursor/debug.log', 'a') as f:
+    f.write(json.dumps({"sessionId":"debug-session","runId":"pre-import","hypothesisId":"A","location":"train.py:18","message":"Before importing train_detection","data":{"yolo_mlflow_disabled":os.environ.get("YOLO_MLFLOW_LOGGING_DISABLED")},"timestamp":int(time.time()*1000)}) + '\n')
+# #endregion
+
 from DpTraining.ObjectDetection.train import train_detection
 from DpTraining.Classification.train import train_classification
-import argparse
-import os
-import sys
-
-# Disable ultralytics's own MLflow logging at the very start
-os.environ["YOLO_MLFLOW_LOGGING_DISABLED"] = "True"
 
 # Add src to path to allow imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

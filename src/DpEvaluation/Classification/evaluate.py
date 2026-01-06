@@ -31,8 +31,12 @@ def evaluate_classification(config):
     """
     logger = setup_logging()
     
+    run_id = None
     try:
         with mlflow.start_run(run_name="classification_evaluation") as run:
+            # Store run_id early to avoid accessing it after context exits
+            run_id = run.info.run_id
+            
             mlflow.log_param("model_type", "classification_evaluation")
 
             eval_config = config['evaluation']['classification']
@@ -111,10 +115,13 @@ def evaluate_classification(config):
             # Log artifacts to MLflow
             mlflow.log_artifacts(output_dir, artifact_path="evaluation_results")
 
-            logger.info(f"Evaluation complete. Results saved in {output_dir} and logged to MLflow run: {run.info.run_id}")
+            logger.info(f"Evaluation complete. Results saved in {output_dir} and logged to MLflow run: {run_id}")
             
     except Exception as e:
-        logger.error(f"Error during classification evaluation: {str(e)}")
+        if run_id:
+            logger.error(f"Error during classification evaluation. MLflow run ID: {run_id}. Error: {str(e)}")
+        else:
+            logger.error(f"Error during classification evaluation: {str(e)}")
         raise
 
 def _evaluate_classification_data(model, unseen_data_path, output_dir):
