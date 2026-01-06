@@ -1,6 +1,5 @@
 venv/
 .venv/
-.cursor/
 runs/
 pipeline_output/models/*
 pipeline_output/processed_data/*
