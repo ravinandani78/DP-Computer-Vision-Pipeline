@@ -12,6 +12,14 @@ import argparse
 import os
 import sys
 
+# Try to import mlflow, but handle if it's not available
+try:
+    import mlflow
+    MLFLOW_AVAILABLE = True
+except ImportError:
+    MLFLOW_AVAILABLE = False
+    print("Warning: mlflow not available. MLflow tracking will be disabled.")
+
 # Add src to path to allow imports from DpPreprocessing etc.
 # Since we're now inside DpPreprocessing, we need to go up one level to reach src
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -28,28 +36,33 @@ def main(config_path):
 
     run_id = None
     try:
-        with mlflow.start_run(run_name="preprocessing") as run:
-            # Store run_id early to avoid accessing it after context exits
-            run_id = run.info.run_id
-            
-            mlflow.log_param("raw_data_dir", config['data']['raw_data_dir'])
-            mlflow.log_param("processed_dir", config['data']['processed_dir'])
-            mlflow.log_params(config['preprocessing'])
+        if MLFLOW_AVAILABLE:
+            with mlflow.start_run(run_name="preprocessing") as run:
+                run_id = run.info.run_id
+                mlflow.log_param("raw_data_dir", config['data']['raw_data_dir'])
+                mlflow.log_param("processed_dir", config['data']['processed_dir'])
+                mlflow.log_params(config['preprocessing'])
 
+                prep = PrepareDataset(config)
+                prep()
+
+                processed_data_dir = config['data']['processed_dir']
+                if os.path.exists(processed_data_dir):
+                    mlflow.log_artifacts(processed_data_dir, artifact_path="preprocessed_data")
+                    print(f"Preprocessing complete. Artifacts logged to MLflow run: {run_id}")
+                else:
+                    print(f"Processed data directory not found: {processed_data_dir}")
+        else:
+            # Run without MLflow tracking
             prep = PrepareDataset(config)
             prep()
-
-            processed_data_dir = config['data']['processed_dir']
-            if os.path.exists(processed_data_dir):
-                mlflow.log_artifacts(processed_data_dir, artifact_path="preprocessed_data")
-                print(f"Preprocessing complete. Artifacts logged to MLflow run: {run_id}")
-            else:
-                print(f"Processed data directory not found: {processed_data_dir}")
+            print("Preprocessing complete (MLflow tracking disabled).")
+            
     except Exception as e:
         if run_id:
             print(f"Preprocessing encountered an error. MLflow run ID: {run_id}")
         else:
-            print(f"Preprocessing encountered an error before MLflow run was created.")
+            print(f"Preprocessing encountered an error.")
         raise
 
 if __name__ == "__main__":
