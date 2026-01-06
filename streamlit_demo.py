@@ -13,7 +13,7 @@ from pathlib import Path
 import json
 from typing import Dict, Any
 import time
-
+import sys  
 # Page configuration
 st.set_page_config(
     page_title="DP Computer Vision Pipeline",
@@ -107,7 +107,8 @@ def run_pipeline_command(command: str, module_name: str):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
-                cwd=os.getcwd()
+                cwd=os.getcwd(),
+                env=os.environ.copy()
             )
             
             output_lines = []
